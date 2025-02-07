@@ -1,3 +1,4 @@
+from app.utils.logger import logger
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import pandas as pd
@@ -12,11 +13,15 @@ class AppState:
 
     @classmethod
     def from_csv(cls):
-        leases = pd.read_csv(store.paths.leases_path)
-        properties = pd.read_csv(store.paths.properties_path)
-        units = pd.read_csv(store.paths.units_path)
-        combined_data = cls.get_combined_data(leases, properties, units)
-        return cls(leases=leases, properties=properties, units=units, combined_data=combined_data)
+        try:
+            leases = pd.read_csv(store.paths.leases_path)
+            properties = pd.read_csv(store.paths.properties_path)
+            units = pd.read_csv(store.paths.units_path)
+            combined_data = cls.get_combined_data(leases, properties, units)
+            return cls(leases=leases, properties=properties, units=units, combined_data=combined_data)
+        except Exception as e:
+            logger.error(f"Error in from_csv: {e}")
+            raise
 
     @staticmethod
     def get_combined_data(leases: pd.DataFrame, properties: pd.DataFrame, units: pd.DataFrame) -> pd.DataFrame:
